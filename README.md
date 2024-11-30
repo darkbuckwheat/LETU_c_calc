@@ -1,5 +1,5 @@
-# c_calc
-LETU_C_calc
+# LETU_c_calc
+Simple text-input calculator on C
 
 This is a simple education task on my 1 semester of programming in LETU. It is a calculator, that get a string expression as input and output the value.
 Programme can sum, subtract, multiply, divide, exponent and evaluate brackets.
