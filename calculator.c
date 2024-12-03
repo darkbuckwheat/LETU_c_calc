@@ -85,12 +85,15 @@ char* to_polsca(char* expr, size_t array_size)
     elem * top = NULL;
     char * par = malloc(array_size * sizeof(char));
     char flag_pushed = 1;
+    char flag_pointer = 0;
+    int brackets_num = 0;
     size_t i, j;
 
     j = 0;
     for (i = 0; *(expr + i) != 10; i++)
     {
         //printf("flag: %d\n", flag_pushed);
+        //printf("%d\n", brackets_num);
         //show_stack(top);
         //whatinside(par, array_size);
         if (*(expr + i) == ' ')
@@ -100,10 +103,11 @@ char* to_polsca(char* expr, size_t array_size)
                 par[j] = ' ';
                 j++;
             }
+            flag_pointer = 0;
         }
         else if ((*(expr + i) == ',') || (*(expr + i) == '.'))
         {
-            if ((j == 0) || !((par[j - 1] <= '9') && (par[j - 1] >= '0')))
+            if ((j == 0) || !((par[j - 1] <= '9') && (par[j - 1] >= '0')) || flag_pointer)
             {
                 strcpy(expr, "Error. Invalid position for pointer.\n");
                 free(par);
@@ -112,6 +116,7 @@ char* to_polsca(char* expr, size_t array_size)
             par[j] = '.';
             j++;
             flag_pushed = 0;
+            flag_pointer = 1;
         }
         else if ((*(expr + i) <= '9') && (*(expr + i) >= '0')) 
         {
@@ -121,6 +126,7 @@ char* to_polsca(char* expr, size_t array_size)
             {
                 par[j] = ' ';
                 j++;
+                flag_pointer = 0;
             }
             par[j] = *(expr + i);
             j++;
@@ -128,6 +134,7 @@ char* to_polsca(char* expr, size_t array_size)
         }
         else if ((((*(expr + i) >= '(') && (*(expr + i) <= '/')) || (*(expr + i) == '^')) && !((*(expr + i) == ',') || (*(expr + i) == '.')))
         {
+            flag_pointer = 0;
             if ((par[j - 1] == ',') || (par[j - 1] == '.'))
             {
                 strcpy(expr, "Error. Invalid pointer and operation order.\n");
@@ -150,6 +157,7 @@ char* to_polsca(char* expr, size_t array_size)
             else if (*(expr + i) == '(')
             {
                 top = push(top, *(expr + i));
+                brackets_num++;
             }
             else if (*(expr + i) == ')')
             {
@@ -160,6 +168,7 @@ char* to_polsca(char* expr, size_t array_size)
                         if (top->data == '(')
                         {
                             top = pop(top);
+                            brackets_num--;
                             break;
                         }
                         if ((j != 0) && (par[j - 1] != ' '))
@@ -174,6 +183,7 @@ char* to_polsca(char* expr, size_t array_size)
                         }
                         top = pop(top);
                     }
+                    brackets_num--;
                 }
                 else 
                 {
@@ -235,9 +245,15 @@ char* to_polsca(char* expr, size_t array_size)
         free(par);
         return expr;
     }
+    if (brackets_num != 0)
+    {
+        strcpy(expr, "Error. Invalid number of brackets.\n");
+        free(par);
+        return expr;
+    }
     while(top != NULL) 
     {
-        if (top->data == '(') 
+        if (top->data == '(' || top->data == ')') 
         {
             //show_stack(top);
             //whatinside(par, array_size);
@@ -382,13 +398,13 @@ void help()
 int main()
 {
     size_t array_size = 101; // чтобы пользователь смог впихнуть в fgets 100 обещаных символов без учёта перевода строки 
+    printf("Hello, dear user! This is a simple calculator."
+    " You can tipe your expression for start your work or type \"help\" in lowercase for more information.\n");
     while(1)
     {
         char *expr = malloc(array_size * sizeof(char));
 
         memset(expr, 0, array_size);
-        printf("Hello, dear user! This is a simple calculator."
-        " You can tipe your expression for start your work or type \"help\" in lowercase for more information.\n");
         fgets(expr, array_size, stdin);
         //whatinside(expr, array_size);
         if (strcmp(expr, "exit\n") == 0) break;
@@ -398,9 +414,17 @@ int main()
             break;
         }
         expr = to_polsca(expr, array_size);
-        expr = calculate(expr, array_size);
-        printf("%s", expr);
-        free(expr);
+        if (expr[0] == 'E')
+        {
+            printf("%s", expr);
+            free(expr);
+        }
+        else
+        {
+            expr = calculate(expr, array_size);
+            printf("%s", expr);
+            free(expr);
+        }
     }
     return 0;
 }
