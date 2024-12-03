@@ -386,20 +386,20 @@ char* calculate(char* pol_expr, size_t array_size)
 
 void help()
 {
-    printf("This is simple calculator, that capable to take string with expression as input.\n"
+    printf("\nThis is simple calculator, that capable to take string with expression as input.\n"
     "You can use \",\" and \".\" as decimal separators for fractions. Also number of spaces irrelevant for\n"
     "value of equation. There are no unary minus, so for negative numbers you need to use \"(0-n)\" construction,\n"
     "where \"n\" is module of your negative number.\n"
     "That calculator can do these list of operations:\n"
     "\t+ --- sum\n\t- --- subtraction\n\t* --- multiplication\n\t/ --- division\n\t^ --- exponentiation\n"
-    "\t(...) --- changing the order of operations\n\nFor stopping work of a programm just tipe\"exit\" in lowercase.\n");
+    "\t(...) --- changing the order of operations\n\nFor stopping work of a programm just tipe \"exit\" in lowercase.\n");
 }
 
 int main()
 {
     size_t array_size = 101; // чтобы пользователь смог впихнуть в fgets 100 обещаных символов без учёта перевода строки 
     printf("Hello, dear user! This is a simple calculator."
-    " You can tipe your expression for start your work or type \"help\" in lowercase for more information.\n");
+    " You can tipe your expression for start your work or type \"help\" in lowercase for more information.\n\n");
     while(1)
     {
         char *expr = malloc(array_size * sizeof(char));
@@ -411,7 +411,7 @@ int main()
         else if(strcmp(expr, "help\n") == 0) 
         {
             help();
-            break;
+            continue;
         }
         expr = to_polsca(expr, array_size);
         if (expr[0] == 'E')
